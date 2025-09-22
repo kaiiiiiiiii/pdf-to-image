@@ -6,35 +6,6 @@ Convert PDF pages into high‑quality images directly in your browser. Private, 
 
 ---
 
-## Table of Contents
-
-- Overview
-- Features
-- Live Demo
-- Quick Start
-- Usage Guide
-- How It Works (Architecture)
-- UI Controls
-- File Naming and Output Formats
-- Privacy and Security
-- Browser Support
-- Project Structure
-- Environment Configuration
-- Deployment
-- Testing
-- Scripts
-- Accessibility
-- Performance Tips
-- Troubleshooting
-- FAQ
-- Roadmap
-- Contributing
-- License
-- Acknowledgements
-- Appendix: Key APIs and Entry Points
-
----
-
 ## Overview
 
 PDF to Image converts each page of your PDF into PNG, JPEG, or WEBP images using in‑browser rendering. No server uploads occur; your files never leave your device.
