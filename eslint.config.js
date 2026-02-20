@@ -1,5 +1,14 @@
-//  @ts-check
-
 import { tanstackConfig } from "@tanstack/eslint-config";
 
-export default [...tanstackConfig];
+const ignores = [
+  "**/.output/**",
+  "**/.nitro/**",
+  "**/.tanstack/**",
+  "**/node_modules/**",
+  "eslint.config.js",
+  "prettier.config.js",
+  "scripts/**",
+  "routeTree.gen.ts",
+];
+
+export default [{ ignores }, ...tanstackConfig];

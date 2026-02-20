@@ -1,8 +1,9 @@
+import { ArrowDownUp, Eraser, MousePointerClick, Trash } from "lucide-react";
+
 import PageThumbnail from "./PageThumbnail";
 import type { PDFDocumentProxy } from "pdfjs-dist";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp, Eraser, MousePointerClick, Trash } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export type FileItem = {
   id: string;
@@ -34,20 +35,28 @@ export default function FileList({
   if (!items.length) return null;
 
   return (
-    <section className={cn("flex flex-col gap-6", className)}>
+    <section className={cn("flex flex-col gap-4", className)}>
       {items.map((item) => {
         const selectedCount = item.selected.size;
         const total = item.pageCount;
 
         return (
-          <article key={item.id} className="rounded-xl border bg-card">
-            <header className="flex items-center justify-between gap-4 border-b px-4 py-3">
-              <div className="min-w-0">
-                <h3 className="truncate text-base font-semibold">
+          <article
+            key={item.id}
+            className="rounded-2xl border bg-white/80 shadow-sm ring-1 ring-slate-100"
+          >
+            <header className="flex items-center justify-between gap-4 border-b bg-gradient-to-r from-slate-50 to-white px-4 py-3">
+              <div className="min-w-0 space-y-1">
+                <h3 className="truncate text-base font-semibold text-slate-900">
                   {item.name}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  {selectedCount} / {total} pages selected
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                    {total} page{total === 1 ? "" : "s"}
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                    {selectedCount} selected
+                  </span>
                 </p>
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -94,18 +103,20 @@ export default function FileList({
             </header>
 
             <div className="p-4">
-              <div className="grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6">
-                {Array.from({ length: item.pageCount }, (_, i) => i + 1).map(
-                  (page) => (
-                    <PageThumbnail
-                      key={page}
-                      doc={item.doc}
-                      pageNumber={page}
-                      selected={item.selected.has(page)}
-                      onToggle={(p) => onTogglePage(item.id, p)}
-                    />
-                  ),
-                )}
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 p-3">
+                <div className="grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6">
+                  {Array.from({ length: item.pageCount }, (_, i) => i + 1).map(
+                    (page) => (
+                      <PageThumbnail
+                        key={page}
+                        doc={item.doc}
+                        pageNumber={page}
+                        selected={item.selected.has(page)}
+                        onToggle={(p) => onTogglePage(item.id, p)}
+                      />
+                    ),
+                  )}
+                </div>
               </div>
             </div>
           </article>

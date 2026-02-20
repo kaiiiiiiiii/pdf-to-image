@@ -31,10 +31,17 @@ export default function ControlsPanel({
   const showQuality = format === "jpeg" || format === "webp";
 
   return (
-    <section className={cn("rounded-xl border bg-card p-4", className)}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <section
+      className={cn(
+        "rounded-2xl border bg-white/80 p-5 shadow-sm ring-1 ring-slate-100",
+        className,
+      )}
+    >
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div className="flex flex-col gap-2 justify-between">
-          <label className="text-sm font-medium">Image format</label>
+          <label className="text-sm font-semibold text-slate-800">
+            Image format
+          </label>
           <Select value={format} onValueChange={onFormatChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select format" />
@@ -51,7 +58,7 @@ export default function ControlsPanel({
         </div>
 
         <div className="flex flex-col gap-2  justify-between">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-semibold text-slate-800">
             Scale: <span className="tabular-nums">{scale.toFixed(1)}x</span>
           </label>
           <Slider
@@ -73,7 +80,7 @@ export default function ControlsPanel({
             showQuality ? "" : "opacity-50 pointer-events-none",
           )}
         >
-          <label className="text-sm font-medium">
+          <label className="text-sm font-semibold text-slate-800">
             Quality:{" "}
             <span className="tabular-nums">{(quality * 100).toFixed(0)}%</span>
           </label>

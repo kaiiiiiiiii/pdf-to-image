@@ -82,8 +82,8 @@ export default function PageThumbnail({
       type="button"
       variant="outline"
       className={cn(
-        "relative overflow-hidden rounded-lg border bg-card hover:shadow-sm transition-shadow focus:outline-none focus:ring h-48 xl:h-56 w-36 xl:w-42",
-        selected ? "ring-2 ring-primary" : "",
+        "relative h-48 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/30 xl:h-56 xl:w-42",
+        selected ? "border-primary/40 ring-2 ring-primary/60" : "",
       )}
       onClick={() => onToggle(pageNumber)}
       aria-pressed={selected}
@@ -91,7 +91,7 @@ export default function PageThumbnail({
       asChild
     >
       <div>
-        <div className="bg-muted grid place-items-center xl:p-px">
+        <div className="grid place-items-center bg-slate-50 xl:p-px">
           {loading && (
             <span className="text-xs text-muted-foreground">Loading…</span>
           )}
@@ -111,7 +111,7 @@ export default function PageThumbnail({
             "absolute top-2 left-2 rounded-md px-1.5 py-0.5 text-[11px] font-medium",
             selected
               ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground",
+              : "bg-slate-900/80 text-white",
           )}
         >
           {pageNumber}
