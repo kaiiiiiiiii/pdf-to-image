@@ -264,117 +264,204 @@ function App() {
   }, [items, format, scale, quality]);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
-      {/* Page intro */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 [text-wrap:balance] md:text-4xl">
-          PDF to Image
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Convert PDF pages to JPEG, PNG, or WebP — entirely in your browser.
-          Nothing is uploaded.
-        </p>
-      </div>
-
-      {/* Drop zone */}
-      <Dropzone
-        onFiles={addFiles}
-        disabled={!!busy}
-        overlayText={busy ?? undefined}
-        progress={busyProgress ?? undefined}
+    <div className="mx-auto mb-8 max-w-[780px] relative bg-[#f8f6f0]">
+      {/* Ruled lines */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, transparent, transparent 30px, rgba(197,212,232,0.22) 30px, rgba(197,212,232,0.22) 31px)",
+        }}
       />
-
-      {/* Toolbar: stats + export actions */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white px-4 py-3 shadow-sm">
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-          <span>
-            <span className="font-semibold tabular-nums text-slate-900">
-              {items.length}
-            </span>{" "}
-            {items.length === 1 ? "file" : "files"}
-          </span>
-          <span className="text-slate-300" aria-hidden="true">|</span>
-          <span>
-            <span className="font-semibold tabular-nums text-slate-900">
-              {totalSelected}
-            </span>{" "}
-            {totalSelected === 1 ? "page" : "pages"} selected
-          </span>
-          {message ? (
-            <>
-              <span className="text-slate-300" aria-hidden="true">|</span>
-              <span
-                className="text-slate-700"
-                aria-live="polite"
-                role="status"
-              >
-                {message}
-              </span>
-            </>
-          ) : null}
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!hasSelection || !!busy}
-            onClick={exportIndividually}
-          >
-            <FileDown size={16} aria-hidden="true" />
-            Download pages
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            disabled={!hasSelection || !!busy}
-            onClick={exportAsZip}
-          >
-            <FileArchive size={16} aria-hidden="true" />
-            Build ZIP
-          </Button>
-        </div>
+      {/* Margin line */}
+      <div className="absolute top-0 bottom-0 left-[72px] w-px bg-[rgba(232,196,196,0.5)] pointer-events-none z-0 hidden md:block" />
+      {/* Hole punches */}
+      <div
+        className="absolute left-[28px] w-[18px] h-[18px] rounded-full bg-[#e8e4dc] border border-[#ccc] z-[2] hidden md:block"
+        style={{ top: 80 }}
+      />
+      <div
+        className="absolute left-[28px] w-[18px] h-[18px] rounded-full bg-[#e8e4dc] border border-[#ccc] z-[2] hidden md:block"
+        style={{ top: "50%", transform: "translateY(-50%)" }}
+      />
+      <div
+        className="absolute left-[28px] w-[18px] h-[18px] rounded-full bg-[#e8e4dc] border border-[#ccc] z-[2] hidden md:block"
+        style={{ bottom: 80 }}
+      />
+      {/* PROOF stamp */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[35deg] font-special text-6xl uppercase tracking-[0.3em] text-[#b8312f] opacity-[0.02] border-[3px] border-[#b8312f] px-8 py-2 pointer-events-none z-[1] whitespace-nowrap select-none"
+        aria-hidden="true"
+      >
+        PROOF
       </div>
 
-      {/* Conversion controls */}
-      <section aria-labelledby="settings-heading" className="mt-6">
-        <h2
-          id="settings-heading"
-          className="mb-3 text-sm font-semibold text-slate-700"
-        >
-          Conversion Settings
-        </h2>
-        <ControlsPanel
-          format={format}
-          onFormatChange={setFormat}
-          scale={scale}
-          onScaleChange={setScale}
-          quality={quality}
-          onQualityChange={setQuality}
-        />
-      </section>
+      <main className="relative z-10 px-6 py-8 md:pl-20 md:pr-8 md:py-10">
+        {/* Notice */}
+        <p className="text-xs text-[#5a5750] mb-5">
+          <span className="text-[#918c82]">[</span>NOTICE
+          <span className="text-[#918c82]">]</span> All document processing
+          occurs locally within your browser. No files are transmitted to any
+          external server.
+        </p>
 
-      {/* File list */}
-      {items.length > 0 && (
-        <section aria-labelledby="files-heading" className="mt-8">
-          <h2
-            id="files-heading"
-            className="mb-3 text-sm font-semibold text-slate-700"
-          >
-            Your PDF Files
+        <p
+          className="text-center text-[#918c82] text-xs tracking-[0.15em] select-none my-5"
+          aria-hidden="true"
+        >
+          - - - - - - - - - - - - - - - - - - - - - - -
+        </p>
+
+        {/* Drop zone */}
+        <div>
+          <h2 className="font-special text-sm uppercase tracking-[0.2em] border-b-2 border-[#2c2a26] inline-block pb-0.5 mb-1 text-[#2c2a26]">
+            Section A: Document Intake
           </h2>
-          <FileList
-            items={items}
-            onTogglePage={togglePage}
-            onSelectAll={selectAll}
-            onClear={clearSel}
-            onInvert={invertSel}
-            onRemove={removeDoc}
+          <p className="text-[10px] italic text-[#5a5750] mb-3">
+            (Place documents face-down in the submission tray)
+          </p>
+          <Dropzone
+            onFiles={addFiles}
+            disabled={!!busy}
+            overlayText={busy ?? undefined}
+            progress={busyProgress ?? undefined}
+          />
+        </div>
+
+        <p
+          className="text-center text-[#918c82] text-xs tracking-[0.15em] select-none my-5"
+          aria-hidden="true"
+        >
+          - - - - - - - - - - - - - - - - - - - - - - -
+        </p>
+
+        {/* Toolbar: stats + export actions */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-[#c5d4e8] bg-transparent px-4 py-3">
+          <div className="flex flex-wrap items-center gap-4 font-mono text-xs text-[#5a5750]">
+            <span>
+              <span className="font-semibold tabular-nums text-[#2c2a26]">
+                {items.length}
+              </span>{" "}
+              {items.length === 1 ? "file" : "files"}
+            </span>
+            <span className="text-[#918c82]" aria-hidden="true">
+              |
+            </span>
+            <span>
+              <span className="font-semibold tabular-nums text-[#2c2a26]">
+                {totalSelected}
+              </span>{" "}
+              {totalSelected === 1 ? "page" : "pages"} selected
+            </span>
+            {message ? (
+              <>
+                <span className="text-[#918c82]" aria-hidden="true">
+                  |
+                </span>
+                <span
+                  className="text-[#5a5750]"
+                  aria-live="polite"
+                  role="status"
+                >
+                  {message}
+                </span>
+              </>
+            ) : null}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-none"
+              disabled={!hasSelection || !!busy}
+              onClick={exportIndividually}
+            >
+              <FileDown size={16} aria-hidden="true" />
+              Download pages
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-none"
+              disabled={!hasSelection || !!busy}
+              onClick={exportAsZip}
+            >
+              <FileArchive size={16} aria-hidden="true" />
+              Build ZIP
+            </Button>
+          </div>
+        </div>
+
+        <p
+          className="text-center text-[#918c82] text-xs tracking-[0.15em] select-none my-5"
+          aria-hidden="true"
+        >
+          - - - - - - - - - - - - - - - - - - - - - - -
+        </p>
+
+        {/* Conversion controls */}
+        <section aria-labelledby="settings-heading" className="mt-6">
+          <h2
+            id="settings-heading"
+            className="font-special text-sm uppercase tracking-[0.2em] border-b-2 border-[#2c2a26] inline-block pb-0.5 mb-1 text-[#2c2a26]"
+          >
+            Section B: Conversion Parameters
+          </h2>
+          <p className="text-[10px] italic text-[#5a5750] mb-3">
+            (Mark selections clearly. Use ☑ to indicate choice.)
+          </p>
+          <ControlsPanel
+            format={format}
+            onFormatChange={setFormat}
+            scale={scale}
+            onScaleChange={setScale}
+            quality={quality}
+            onQualityChange={setQuality}
           />
         </section>
-      )}
-    </main>
+
+        <p
+          className="text-center text-[#918c82] text-xs tracking-[0.15em] select-none my-5"
+          aria-hidden="true"
+        >
+          - - - - - - - - - - - - - - - - - - - - - - -
+        </p>
+
+        {/* File list */}
+        {items.length > 0 && (
+          <section aria-labelledby="files-heading" className="mt-8">
+            <h2
+              id="files-heading"
+              className="font-special text-sm uppercase tracking-[0.2em] border-b-2 border-[#2c2a26] inline-block pb-0.5 mb-1 text-[#2c2a26]"
+            >
+              Section C: Document Manifest
+            </h2>
+            <p className="text-[10px] italic text-[#5a5750] mb-3">
+              (Inventory of submitted documents and processing status)
+            </p>
+            <FileList
+              items={items}
+              onTogglePage={togglePage}
+              onSelectAll={selectAll}
+              onClear={clearSel}
+              onInvert={invertSel}
+              onRemove={removeDoc}
+            />
+          </section>
+        )}
+
+        {/* Footer */}
+        <footer className="mt-8 pt-3 border-t-2 border-[#2c2a26] text-center text-[10px] text-[#918c82] tracking-widest uppercase leading-relaxed">
+          Bureau of Document Conversion Services
+          <br />
+          Processed entirely within your browser — No data leaves this machine
+          <br />
+          <span className="tracking-[0.3em]">— END OF DOCUMENT —</span>
+        </footer>
+      </main>
+    </div>
   );
 }
 

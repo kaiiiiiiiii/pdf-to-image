@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap");
 @import "tailwindcss";
 
 @import "tw-animate-css";
@@ -7,57 +7,56 @@
 
 body {
   @apply m-0 min-w-sm;
-  font-family:
-    "Space Grotesk", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-image:
-    radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.08), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(236, 72, 153, 0.08), transparent 35%),
-    linear-gradient(180deg, #f8fafc 0%, #ffffff 65%);
+  font-family: "Courier Prime", "Courier New", monospace;
+  background-color: #e6e1d7;
 }
 
 code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+
+.font-typewriter {
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+
+.font-special {
+  font-family: "Special Elite", "Courier New", monospace;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.871 0.006 286.286);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.871 0.006 286.286);
+  --background: #f8f6f0;
+  --foreground: #2c2a26;
+  --card: #f8f6f0;
+  --card-foreground: #2c2a26;
+  --popover: #f8f6f0;
+  --popover-foreground: #2c2a26;
+  --primary: #2c2a26;
+  --primary-foreground: #f8f6f0;
+  --secondary: #eae6dc;
+  --secondary-foreground: #2c2a26;
+  --muted: #eae6dc;
+  --muted-foreground: #918c82;
+  --accent: #eae6dc;
+  --accent-foreground: #2c2a26;
+  --destructive: #b8312f;
+  --destructive-foreground: #b8312f;
+  --border: #c5d4e8;
+  --input: #c5d4e8;
+  --ring: #918c82;
+  --chart-1: #2c2a26;
+  --chart-2: #5a5750;
+  --chart-3: #918c82;
+  --chart-4: #b8312f;
+  --chart-5: #c5d4e8;
+  --radius: 0.0625rem;
+  --sidebar: #f8f6f0;
+  --sidebar-foreground: #2c2a26;
+  --sidebar-primary: #2c2a26;
+  --sidebar-primary-foreground: #f8f6f0;
+  --sidebar-accent: #eae6dc;
+  --sidebar-accent-foreground: #2c2a26;
+  --sidebar-border: #c5d4e8;
+  --sidebar-ring: #918c82;
 }
 
 .dark {

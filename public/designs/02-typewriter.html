@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF-to-Image — Document Processing Facility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --paper: #f8f6f0;
+    --ink: #2c2a26;
+    --ink-light: #5a5750;
+    --ink-faint: #918c82;
+    --rule-blue: #c5d4e8;
+    --rule-blue-faint: #dce5f0;
+    --red: #b8312f;
+    --red-light: #d44b4920;
+    --margin-line: #e8c4c4;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: #e8e4dc;
+    color: var(--ink);
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    line-height: 1.7;
+    -webkit-font-smoothing: auto;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 2rem auto;
+    background: var(--paper);
+    position: relative;
+    padding: 0;
+    box-shadow: 2px 3px 12px #0002;
+  }
+
+  /* Ruled lines background */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 26px,
+        var(--rule-blue-faint) 26px,
+        var(--rule-blue-faint) 27px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Left margin red line */
+  .page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 72px;
+    width: 1px;
+    background: var(--margin-line);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page > * { position: relative; z-index: 1; }
+
+  .content {
+    padding: 2.5rem 2.5rem 2.5rem 5.5rem;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+
+  .header-org {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    color: var(--ink-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .header h1 {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .header-underline {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+
+  .header-meta {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+  }
+
+  .header-meta span { margin: 0 0.5rem; }
+
+  .typed-rule {
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    margin: 1.2rem 0;
+    user-select: none;
+  }
+
+  /* ─── STAMP OVERLAYS ─── */
+  .stamp {
+    position: absolute;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border: 3px solid;
+    padding: 0.3rem 1.2rem;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .stamp-confidential {
+    top: 3.5rem;
+    right: 2rem;
+    color: var(--red);
+    border-color: var(--red);
+    font-size: 1.1rem;
+    transform: rotate(-12deg);
+  }
+
+  .stamp-processed {
+    bottom: 8rem;
+    right: 3rem;
+    color: #2d6a30;
+    border-color: #2d6a30;
+    font-size: 0.9rem;
+    transform: rotate(6deg);
+    border-radius: 50%;
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.3;
+    padding: 0.8rem;
+  }
+
+  .stamp-draft {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    color: var(--red);
+    border-color: var(--red);
+    font-size: 3rem;
+    letter-spacing: 0.3em;
+    opacity: 0.06;
+    border-width: 5px;
+    padding: 0.5rem 2rem;
+    white-space: nowrap;
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-head {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.8rem;
+    display: inline-block;
+  }
+
+  .section-note {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    font-style: italic;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .bracket { color: var(--ink-faint); }
+  .underlined { text-decoration: underline; text-decoration-style: solid; text-underline-offset: 3px; }
+
+  /* ─── DROPZONE ─── */
+  .dropzone-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--ink-faint);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    background: transparent;
+  }
+
+  .dropzone:hover {
+    border-color: var(--ink);
+    background: #f0ede5;
+  }
+
+  .dropzone-form-number {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.8rem;
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+  }
+
+  .dropzone-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: var(--ink-light);
+  }
+
+  .dropzone-text {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .dropzone-sub {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+  }
+
+  .dropzone-legal {
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+    margin-top: 1rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--rule-blue);
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  /* ─── FORM FIELDS ─── */
+  .settings-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .form-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 130px;
+    flex-shrink: 0;
+    color: var(--ink-light);
+  }
+
+  .form-label::after { content: ':'; }
+
+  .form-value {
+    font-size: 0.82rem;
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .checkbox-opt {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-size: 0.82rem;
+    transition: color 0.1s;
+    padding: 0.1rem 0;
+  }
+
+  .checkbox-opt:hover { color: var(--ink); }
+
+  .checkbox-opt .box {
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .checkbox-opt.active { color: var(--ink); font-weight: 700; }
+  .checkbox-opt:not(.active) { color: var(--ink-light); }
+
+  .fill-line {
+    border-bottom: 1px solid var(--ink);
+    min-width: 50px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 700;
+    padding: 0 0.3rem;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.9rem;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .slider-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--ink);
+    max-width: 200px;
+  }
+
+  .btn-convert {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin: 1.5rem auto 0;
+    padding: 0.6rem 1.5rem;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-convert:hover { background: var(--red); border-color: var(--red); }
+
+  /* ─── FILE MANIFEST ─── */
+  .manifest-section {
+    margin-top: 1.5rem;
+  }
+
+  .manifest-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .manifest-table th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--ink);
+    padding: 0.3rem 0.5rem;
+    color: var(--ink-light);
+  }
+
+  .manifest-table td {
+    padding: 0.5rem 0.5rem;
+    border-bottom: 1px solid var(--rule-blue);
+    vertical-align: top;
+  }
+
+  .manifest-table tr:last-child td { border-bottom: 2px solid var(--ink); }
+
+  .file-name {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    font-size: 0.8rem;
+  }
+
+  .mono { font-family: 'Courier Prime', monospace; }
+
+  .status-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .badge-ready { color: #2d6a30; border-color: #2d6a30; }
+  .badge-processing { color: var(--red); border-color: var(--red); }
+  .badge-queued { color: var(--ink-faint); border-color: var(--ink-faint); }
+
+  /* ─── THUMBNAILS ─── */
+  .thumb-strip {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+
+  .thumb {
+    width: 56px;
+    height: 72px;
+    border: 1px solid var(--ink-faint);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    color: var(--ink-faint);
+    background: var(--paper);
+    position: relative;
+  }
+
+  .thumb-lines {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .thumb-lines .tl {
+    height: 2px;
+    background: var(--rule-blue);
+  }
+
+  .thumb-lines .tl.short { width: 55%; }
+  .thumb-lines .tl.med { width: 75%; }
+  .thumb-lines .tl.block { height: 10px; width: 100%; background: var(--rule-blue); }
+
+  .thumb-pg {
+    position: absolute;
+    bottom: 1px;
+    font-size: 0.5rem;
+    color: var(--ink-faint);
+    background: var(--paper);
+    padding: 0 2px;
+  }
+
+  .thumb.more-thumb {
+    border-style: dashed;
+    justify-content: center;
+  }
+
+  /* ─── DETAIL ROWS ─── */
+  .file-detail {
+    border: 1px solid var(--rule-blue);
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    background: transparent;
+    position: relative;
+  }
+
+  .file-detail-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .file-detail-name {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.9rem;
+  }
+
+  .file-detail-meta {
+    font-size: 0.7rem;
+    color: var(--ink-light);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .file-detail-meta span::before {
+    content: '▸ ';
+    color: var(--ink-faint);
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--rule-blue);
+    margin-top: 0.6rem;
+    position: relative;
+  }
+
+  .progress-bar .fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: var(--ink);
+    transition: width 0.3s;
+  }
+
+  .progress-label {
+    font-size: 0.65rem;
+    color: var(--ink-light);
+    margin-top: 0.25rem;
+    text-align: right;
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    margin-top: 2rem;
+    padding-top: 0.8rem;
+    border-top: 2px solid var(--ink);
+    font-size: 0.65rem;
+    color: var(--ink-faint);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .footer a { color: var(--ink-light); }
+
+  /* ─── TAB STOPS ─── */
+  .tab-line {
+    display: flex;
+    gap: 0;
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    margin-bottom: 0.3rem;
+  }
+
+  .tab-line .tab-key {
+    min-width: 160px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.65rem;
+  }
+
+  .tab-line .tab-val { flex: 1; }
+  .tab-line .tab-dots {
+    flex: 1;
+    border-bottom: 1px dotted var(--ink-faint);
+    margin: 0 0.3rem;
+    align-self: baseline;
+    min-width: 20px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    .content { padding: 1.5rem 1rem 1.5rem 1.5rem; }
+    .page::after { left: 24px; }
+    .form-row { flex-direction: column; gap: 0.2rem; }
+    .form-label { min-width: auto; }
+    .stamp-confidential { font-size: 0.8rem; top: 1.5rem; right: 0.5rem; }
+    .stamp-processed { bottom: 4rem; right: 1rem; width: 80px; height: 80px; font-size: 0.65rem; }
+    .stamp-draft { font-size: 1.8rem; }
+    .manifest-table { font-size: 0.65rem; }
+    .manifest-table th, .manifest-table td { padding: 0.3rem 0.25rem; }
+  }
+
+  /* Typing cursor animation for heading */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--ink);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Subtle paper texture */
+  .page-texture {
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='6' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='%232c2a2604'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Hole punches */
+  .hole-punch {
+    position: absolute;
+    left: 28px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid #ccc;
+    z-index: 2;
+    box-shadow: inset 0 1px 3px #0002;
+  }
+
+  .hole-punch.top { top: 80px; }
+  .hole-punch.mid { top: 50%; transform: translateY(-50%); }
+  .hole-punch.bot { bottom: 80px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-texture"></div>
+
+  <!-- Hole punches -->
+  <div class="hole-punch top"></div>
+  <div class="hole-punch mid"></div>
+  <div class="hole-punch bot"></div>
+
+  <!-- Stamps -->
+  <div class="stamp stamp-confidential">CONFIDENTIAL</div>
+  <div class="stamp stamp-processed">PROCESSED<br>06/25/25</div>
+  <div class="stamp stamp-draft">PROOF</div>
+
+  <div class="content">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-org">Bureau of Document Conversion Services</div>
+      <h1>PDF-to-Image Converter<span class="cursor"></span></h1>
+      <div class="header-underline">========================</div>
+      <div class="header-meta">
+        <span>Form DCS-7742</span>
+        <span>|</span>
+        <span>Rev. 06/2025</span>
+        <span>|</span>
+        <span>Classification: UNCLASSIFIED</span>
+      </div>
+    </header>
+
+    <div class="typed-rule">- - - - - - - - - - - - - - - - - - - - - - -</div>
+
+    <p style="font-size:0.78rem; color:var(--ink-light); margin-bottom:0.5rem; line-height:1.6;">
+      <span class="bracket">[</span>NOTICE<span class="bracket">]</span> All document processing occurs _locally_ within your
+      browser. No files are transmitted to any external server. This facility
+      operates in accordance with <span class="underlined">Privacy Directive 2024-11</span>.
+    </p>
+
+    <div class="typed-rule">* * *</div>
+
+    <!-- DROPZONE -->
+    <section class="dropzone-section">
+      <span class="section-head">Section A: Document Intake</span>
+      <span class="section-note">(Place documents face-down in the submission tray)</span>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop PDF files here or click to browse">
+        <span class="dropzone-form-number">Form DCS-7742-A</span>
+        <span class="dropzone-icon">📎</span>
+        <div class="dropzone-text"><span class="bracket">[</span> DROP PDF FILES HERE <span class="bracket">]</span></div>
+        <div class="dropzone-sub">-- or click to open file selector --</div>
+        <div class="dropzone-legal">
+          AUTHORIZED FILE TYPES: .pdf only<br>
+          MAXIMUM RECOMMENDED SIZE: 100 MB per document<br>
+          PROCESSING METHOD: Client-side rendering via PDF.js<br>
+          NOTE: _Multiple files_ may be submitted simultaneously.
+        </div>
+      </div>
+    </section>
+
+    <div class="typed-rule">- - - - - - - - - - - - - - - - - - - - - - -</div>
+
+    <!-- SETTINGS -->
+    <section class="settings-section">
+      <span class="section-head">Section B: Conversion Parameters</span>
+      <span class="section-note">(Mark selections clearly. Use ☑ to indicate choice.)</span>
+
+      <div class="form-row">
+        <span class="form-label">B1. Output Format</span>
+        <div class="form-value">
+          <span class="checkbox-opt active"><span class="box">☑</span> PNG</span>
+          <span class="checkbox-opt"><span class="box">☐</span> JPEG</span>
+          <span class="checkbox-opt"><span class="box">☐</span> WebP</span>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-left:1rem; margin-bottom:0.8rem;">
+        <span style="font-size:0.68rem; color:var(--ink-faint);">
+          <span class="bracket">[</span>PNG = lossless, best for text/diagrams. JPEG = smaller files. WebP = modern, may not be supported by all viewers.<span class="bracket">]</span>
+        </span>
+      </div>
+
+      <div class="form-row">
+        <span class="form-label">B2. Render Scale</span>
+        <div class="form-value">
+          <span class="checkbox-opt"><span class="box">☐</span> 1×</span>
+          <span class="checkbox-opt active"><span class="box">☑</span> 2×</span>
+          <span class="checkbox-opt"><span class="box">☐</span> 3×</span>
+          <span class="checkbox-opt"><span class="box">☐</span> 4×</span>
+          <span style="font-size:0.68rem; color:var(--ink-faint); margin-left:0.5rem;">
+            <span class="bracket">(</span>selected: <span class="fill-line" style="min-width:2ch;">2×</span><span class="bracket">)</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <span class="form-label">B3. JPEG/WebP Quality</span>
+        <div class="form-value">
+          <div class="slider-row">
+            <span class="mono" style="font-size:0.7rem;">60%</span>
+            <input type="range" min="60" max="100" step="5" value="92">
+            <span class="mono" style="font-size:0.7rem;">100%</span>
+          </div>
+          <span style="font-size:0.68rem;">Current: <span class="fill-line" style="min-width:3ch;">92%</span></span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <span class="form-label">B4. Background</span>
+        <div class="form-value">
+          <span class="checkbox-opt active"><span class="box">☑</span> White (#fff)</span>
+          <span class="checkbox-opt"><span class="box">☐</span> Transparent</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <span class="form-label">B5. Download Mode</span>
+        <div class="form-value">
+          <span class="checkbox-opt active"><span class="box">☑</span> Individual files</span>
+          <span class="checkbox-opt"><span class="box">☐</span> ZIP archive</span>
+        </div>
+      </div>
+
+      <button class="btn-convert"><span class="bracket">[</span> EXECUTE CONVERSION <span class="bracket">]</span></button>
+    </section>
+
+    <div class="typed-rule">= = = = = = = = = = = = = = = = = = = = = = =</div>
+
+    <!-- FILE MANIFEST -->
+    <section class="manifest-section">
+      <span class="section-head">Section C: Document Manifest</span>
+      <span class="section-note">(Inventory of submitted documents and processing status)</span>
+
+      <table class="manifest-table">
+        <thead>
+          <tr>
+            <th style="width:40%;">Document Name</th>
+            <th>Pages</th>
+            <th>Size</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="file-name">Q4_Earnings_Report_2024.pdf</td>
+            <td class="mono">42</td>
+            <td class="mono">4.2 MB</td>
+            <td><span class="status-badge badge-ready">☑ READY</span></td>
+          </tr>
+          <tr>
+            <td class="file-name">Brand_Guidelines_v3.1.pdf</td>
+            <td class="mono">156</td>
+            <td class="mono">18.7 MB</td>
+            <td><span class="status-badge badge-processing">⟳ CONVERTING</span></td>
+          </tr>
+          <tr>
+            <td class="file-name">Lease_Agreement_42_Oak.pdf</td>
+            <td class="mono">8</td>
+            <td class="mono">890 KB</td>
+            <td><span class="status-badge badge-queued">◻ QUEUED</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="typed-rule">* * *</div>
+
+      <!-- Detail: File 1 -->
+      <div class="file-detail">
+        <div class="file-detail-head">
+          <span class="file-detail-name"><span class="bracket">[</span>001<span class="bracket">]</span> Q4_Earnings_Report_2024.pdf</span>
+          <span class="status-badge badge-ready">☑ READY</span>
+        </div>
+        <div class="file-detail-meta">
+          <span>42 pages</span>
+          <span>4.2 MB</span>
+          <span>Uploaded 10:42:07 AM</span>
+        </div>
+        <div class="thumb-strip">
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl short"></div><div class="tl block"></div><div class="tl"></div><div class="tl med"></div>
+            </div>
+            <span class="thumb-pg">p.1</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl"></div><div class="tl short"></div><div class="tl"></div><div class="tl"></div><div class="tl med"></div>
+            </div>
+            <span class="thumb-pg">p.2</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl block"></div><div class="tl"></div><div class="tl short"></div><div class="tl"></div>
+            </div>
+            <span class="thumb-pg">p.3</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl med"></div><div class="tl"></div><div class="tl block"></div>
+            </div>
+            <span class="thumb-pg">p.4</span>
+          </div>
+          <div class="thumb more-thumb"><span>+38</span><span class="thumb-pg">more</span></div>
+        </div>
+      </div>
+
+      <!-- Detail: File 2 -->
+      <div class="file-detail">
+        <div class="file-detail-head">
+          <span class="file-detail-name"><span class="bracket">[</span>002<span class="bracket">]</span> Brand_Guidelines_v3.1.pdf</span>
+          <span class="status-badge badge-processing">⟳ CONVERTING</span>
+        </div>
+        <div class="file-detail-meta">
+          <span>156 pages</span>
+          <span>18.7 MB</span>
+          <span>Uploaded 10:39:53 AM</span>
+        </div>
+        <div class="thumb-strip">
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl block" style="height:18px;"></div><div class="tl short"></div><div class="tl"></div>
+            </div>
+            <span class="thumb-pg">p.1</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl"></div><div class="tl block"></div><div class="tl"></div>
+            </div>
+            <span class="thumb-pg">p.2</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl block" style="height:14px;"></div><div class="tl block" style="height:14px;"></div>
+            </div>
+            <span class="thumb-pg">p.3</span>
+          </div>
+          <div class="thumb more-thumb"><span>+153</span><span class="thumb-pg">more</span></div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:15%;"></div></div>
+        <div class="progress-label">Processing page 24 of 156 .............. 15%</div>
+      </div>
+
+      <!-- Detail: File 3 -->
+      <div class="file-detail">
+        <div class="file-detail-head">
+          <span class="file-detail-name"><span class="bracket">[</span>003<span class="bracket">]</span> Lease_Agreement_42_Oak.pdf</span>
+          <span class="status-badge badge-queued">◻ QUEUED</span>
+        </div>
+        <div class="file-detail-meta">
+          <span>8 pages</span>
+          <span>890 KB</span>
+          <span>Uploaded 10:44:21 AM</span>
+        </div>
+        <div class="thumb-strip">
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl"></div><div class="tl short"></div><div class="tl"></div><div class="tl"></div><div class="tl med"></div><div class="tl"></div>
+            </div>
+            <span class="thumb-pg">p.1</span>
+          </div>
+          <div class="thumb">
+            <div class="thumb-lines">
+              <div class="tl"></div><div class="tl med"></div><div class="tl"></div><div class="tl"></div><div class="tl short"></div><div class="tl"></div>
+            </div>
+            <span class="thumb-pg">p.2</span>
+          </div>
+          <div class="thumb more-thumb"><span>+6</span><span class="thumb-pg">more</span></div>
+        </div>
+      </div>
+
+      <div class="typed-rule">- - - - - - - - - - - - - - - - - - - - - - -</div>
+
+      <!-- Summary -->
+      <div style="font-size:0.72rem; color:var(--ink-light);">
+        <div class="tab-line">
+          <span class="tab-key">Total Documents</span>
+          <span class="tab-dots"></span>
+          <span class="tab-val mono">3</span>
+        </div>
+        <div class="tab-line">
+          <span class="tab-key">Total Pages</span>
+          <span class="tab-dots"></span>
+          <span class="tab-val mono">206</span>
+        </div>
+        <div class="tab-line">
+          <span class="tab-key">Est. Output Size</span>
+          <span class="tab-dots"></span>
+          <span class="tab-val mono">~127 MB</span>
+        </div>
+        <div class="tab-line">
+          <span class="tab-key">Output Format</span>
+          <span class="tab-dots"></span>
+          <span class="tab-val mono">PNG @ 2×</span>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="typed-rule">= = = = = = = = = = = = = = = = = = = = = = =</div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      BUREAU OF DOCUMENT CONVERSION SERVICES<br>
+      Form DCS-7742 · Processed entirely within your browser<br>
+      Built with PDF.js · <a href="#">Source Code</a> · No data leaves this machine<br>
+      <span style="letter-spacing:0.3em;">- END OF DOCUMENT -</span>
+    </footer>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -79,20 +79,20 @@ export default function PageThumbnail({
     <button
       type="button"
       className={cn(
-        "relative h-48 w-36 overflow-hidden rounded-xl border bg-white transition-[border-color,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 xl:h-56 xl:w-42",
+        "relative h-48 w-36 overflow-hidden border bg-[#f8f6f0] transition-[border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c2a26]/60 xl:h-56 xl:w-42",
         selected
-          ? "border-primary/50 ring-2 ring-primary/40"
-          : "border-slate-200 hover:border-slate-300",
+          ? "border-2 border-[#2c2a26]"
+          : "border-[#c5d4e8] hover:border-[#918c82]",
       )}
       onClick={() => onToggle(pageNumber)}
       aria-pressed={selected}
       aria-label={`Page ${pageNumber}${selected ? ", selected" : ""}`}
     >
-      <div className="grid h-full place-items-center bg-slate-50">
+      <div className="grid h-full place-items-center bg-[#f8f6f0]">
         {loading && (
-          <span className="text-xs text-muted-foreground">Loading…</span>
+          <span className="text-xs text-[#918c82]">Loading…</span>
         )}
-        {error && <span className="text-xs text-destructive">{error}</span>}
+        {error && <span className="text-xs text-[#b8312f]">{error}</span>}
         {!loading && !error && src && (
           <img
             src={src}
@@ -108,37 +108,25 @@ export default function PageThumbnail({
       {/* Page number badge */}
       <div
         className={cn(
-          "absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[11px] font-medium",
+          "absolute left-2 top-2 px-1.5 py-0.5 text-[11px] font-mono",
           selected
-            ? "bg-primary text-primary-foreground"
-            : "bg-slate-900/70 text-white",
+            ? "bg-[#2c2a26] text-[#f8f6f0]"
+            : "bg-[#918c82] text-[#f8f6f0]",
         )}
         aria-hidden="true"
       >
         {pageNumber}
       </div>
-      {/* Selected indicator */}
-      <div
+      {/* Selection indicator */}
+      <span
         className={cn(
-          "absolute bottom-2 right-2 h-4 w-4 rounded-sm border-2 transition-colors",
-          selected
-            ? "border-primary bg-primary"
-            : "border-slate-300 bg-white",
+          "absolute bottom-1.5 right-1.5 text-base leading-none",
+          selected ? "text-[#2c2a26]" : "text-[#918c82]",
         )}
         aria-hidden="true"
       >
-        {selected && (
-          <svg
-            viewBox="0 0 10 10"
-            className="h-full w-full text-primary-foreground"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <polyline points="2,5 4,7.5 8,2.5" />
-          </svg>
-        )}
-      </div>
+        {selected ? "☑" : "☐"}
+      </span>
     </button>
   );
 }

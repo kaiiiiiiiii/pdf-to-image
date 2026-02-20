@@ -1,37 +1,35 @@
-import { GitBranch, ShieldCheck } from "lucide-react";
-
-import { Button } from "./ui/button";
 import { APP_CONFIG } from "@/lib/config";
 
 const { version, homepage } = APP_CONFIG;
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-20 w-full border-b bg-white/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-sm">
-            <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="leading-tight">
-            <span className="text-base font-semibold tracking-tight">
-              PDF to Image Studio
-            </span>
-            <span className="block text-xs text-muted-foreground">
-              Local-only conversions, refreshed design.
-            </span>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          asChild
-          className="hover:text-primary transition-colors text-xs font-mono text-muted-foreground"
+    <header className="w-full bg-[#f8f6f0]">
+      <div className="mx-auto max-w-[780px] px-6 py-6 text-center">
+        <p className="font-special text-[10px] uppercase tracking-[0.3em] text-[#918c82]">
+          Bureau of Document Conversion Services
+        </p>
+        <h1 className="font-special mt-2 text-2xl uppercase tracking-[0.12em] text-[#2c2a26] sm:text-3xl">
+          PDF-to-Image Converter
+        </h1>
+        <p
+          className="font-typewriter mt-1 text-sm leading-none text-[#918c82]"
+          aria-hidden="true"
         >
-          <a href={homepage} target="_blank" rel="noopener noreferrer">
-            <GitBranch className="h-5 w-5" aria-hidden="true" /> v{version}
+          ========================
+        </p>
+        <p className="font-typewriter mt-3 text-[11px] text-[#5a5750]">
+          Form DCS-7742 &nbsp;|&nbsp; Rev. 02/2026 &nbsp;|&nbsp;
+          Classification: UNCLASSIFIED &nbsp;|&nbsp;{" "}
+          <a
+            href={homepage}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[#918c82] underline-offset-2 hover:text-[#2c2a26]"
+          >
+            v{version}
           </a>
-        </Button>
+        </p>
       </div>
     </header>
   );

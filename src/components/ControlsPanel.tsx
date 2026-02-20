@@ -33,33 +33,36 @@ export default function ControlsPanel({
   return (
     <section
       className={cn(
-        "rounded-2xl border bg-white/80 p-5 shadow-sm ring-1 ring-slate-100",
+        "border border-[#c5d4e8] bg-transparent",
         className,
       )}
     >
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="flex flex-col gap-2 justify-between">
-          <label className="text-sm font-semibold text-slate-800">
-            Image format
+      <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x sm:divide-[#c5d4e8]">
+        <div className="flex flex-col gap-2 justify-between p-4">
+          <label className="font-special text-[10px] uppercase tracking-widest text-[#918c82]">
+            B1. Output Format
           </label>
           <Select value={format} onValueChange={onFormatChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full rounded-none border-[#918c82] bg-transparent font-mono text-xs uppercase">
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-none border-[#918c82]">
               <SelectItem value="jpeg">JPEG</SelectItem>
               <SelectItem value="png">PNG</SelectItem>
               <SelectItem value="webp">WEBP</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] text-[#918c82]">
             WEBP falls back automatically if unsupported.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2  justify-between">
-          <label className="text-sm font-semibold text-slate-800">
-            Scale: <span className="tabular-nums">{scale.toFixed(1)}x</span>
+        <div className="flex flex-col gap-2 justify-between p-4">
+          <label className="font-special text-[10px] uppercase tracking-widest text-[#918c82]">
+            B2. Scale:{" "}
+            <span className="border-b border-[#2c2a26] tabular-nums text-[#2c2a26]">
+              {scale.toFixed(1)}×
+            </span>
           </label>
           <Slider
             value={[scale]}
@@ -69,20 +72,22 @@ export default function ControlsPanel({
             step={0.5}
             className="w-full"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] text-[#918c82]">
             Controls output resolution (multiplied by device pixel ratio).
           </p>
         </div>
 
         <div
           className={cn(
-            "flex flex-col gap-2 justify-between",
+            "flex flex-col gap-2 justify-between p-4",
             showQuality ? "" : "opacity-50 pointer-events-none",
           )}
         >
-          <label className="text-sm font-semibold text-slate-800">
-            Quality:{" "}
-            <span className="tabular-nums">{(quality * 100).toFixed(0)}%</span>
+          <label className="font-special text-[10px] uppercase tracking-widest text-[#918c82]">
+            B3. Quality:{" "}
+            <span className="border-b border-[#2c2a26] tabular-nums text-[#2c2a26]">
+              {(quality * 100).toFixed(0)}%
+            </span>
           </label>
           <Slider
             value={[quality]}
@@ -93,7 +98,7 @@ export default function ControlsPanel({
             className="w-full"
             disabled={!showQuality}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] text-[#918c82]">
             Applies to JPEG and WEBP only.
           </p>
         </div>

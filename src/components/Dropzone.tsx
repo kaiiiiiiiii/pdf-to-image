@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader2, UploadCloud } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -16,7 +16,7 @@ export default function Dropzone({
   onFiles,
   className,
   children,
-  textColor = "text-muted-foreground",
+  textColor: _textColor = "text-muted-foreground",
   disabled = false,
   overlayText,
   progress,
@@ -40,12 +40,10 @@ export default function Dropzone({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border-2 border-dashed p-6 text-center transition-colors duration-200",
-        (dragOver || hover) && !disabled
-          ? "border-primary/70 bg-secondary/30 ring-2 ring-primary/10"
-          : "border-border bg-card/50",
+        "group relative overflow-hidden border-2 border-dashed border-[#918c82] bg-transparent p-6 text-center transition-colors duration-200",
+        (dragOver || hover) && !disabled && "border-[#2c2a26] bg-[#f0ede5]",
         disabled && "opacity-80",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+        "focus:outline-none focus-visible:ring-1 focus-visible:ring-[#918c82]",
         className,
       )}
       onMouseEnter={() => !disabled && setHover(true)}
@@ -98,46 +96,41 @@ export default function Dropzone({
       />
       <div className="pointer-events-none select-none relative z-10">
         {children ?? (
-          <div className="flex flex-col items-center gap-2">
-            <UploadCloud
-              className={cn(
-                "h-7 w-7 transition-all duration-200",
-                textColor,
-                dragOver ? "text-primary" : "group-hover:text-foreground/80",
-              )}
+          <div className="flex flex-col items-center gap-3">
+            <span
+              className="block text-2xl text-[#5a5750]"
               aria-hidden="true"
-            />
-            <div className={cn("text-base font-medium", textColor)}>
+            >
+              📎
+            </span>
+            <div className="font-special text-base text-[#2c2a26] tracking-wide">
               {dragOver
-                ? "Release to upload"
-                : "Drop PDFs here or click to browse"}
+                ? "[ RELEASE TO UPLOAD ]"
+                : "[ DROP PDF FILES HERE ]"}
             </div>
-            <div className={cn("text-xs", textColor)}>
-              All processing happens locally in your browser
+            <div className="text-xs text-[#5a5750]">
+              -- or click to open file selector --
+            </div>
+            <div className="mt-2 text-[10px] uppercase tracking-widest text-[#918c82]">
+              AUTHORIZED FILE TYPES: .pdf only | All processing happens locally
+              in your browser
             </div>
           </div>
         )}
       </div>
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200",
-          "bg-[radial-gradient(ellipse_at_top_left,theme(colors.primary/6),transparent_55%)]",
-          dragOver ? "opacity-100" : "opacity-0",
-        )}
-      />
 
       {/* Busy overlay */}
       {disabled ? (
-        <div className="absolute inset-0 z-20 grid place-items-center bg-white/70 backdrop-blur-sm ring-1 ring-border">
+        <div className="absolute inset-0 z-20 grid place-items-center bg-[#f8f6f0]/80">
           <div className="flex flex-col items-center gap-2 text-center">
-            <Loader2 className={cn("h-5 w-5 animate-spin text-slate-500")} />
+            <Loader2 className="h-5 w-5 animate-spin text-[#918c82]" />
             {overlayText ? (
-              <div className="text-xs text-slate-600 px-3">{overlayText}</div>
+              <div className="text-xs text-[#5a5750] px-3">{overlayText}</div>
             ) : null}
             {typeof progress === "number" ? (
-              <div className="mt-1 h-1 w-40 rounded-full bg-slate-200 overflow-hidden">
+              <div className="mt-1 h-px w-40 bg-[#c5d4e8] overflow-hidden">
                 <div
-                  className="h-full bg-slate-500/70 transition-[width] duration-200"
+                  className="h-full bg-[#2c2a26] transition-[width] duration-200"
                   style={{
                     width: `${Math.max(0, Math.min(100, Math.round(progress * 100)))}%`,
                   }}
