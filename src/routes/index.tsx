@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  FileArchive,
-  FileDown,
-  Gauge,
-  ShieldCheck,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { FileArchive, FileDown } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import type { FileItem } from "@/components/FileList";
@@ -270,219 +263,89 @@ function App() {
     }
   }, [items, format, scale, quality]);
 
-  const statusLine = busy
-    ? busy
-    : `${items.length} file${items.length === 1 ? "" : "s"} loaded · ${totalSelected} page${
-        totalSelected === 1 ? "" : "s"
-      } selected`;
-
   return (
-    <main className="relative mx-auto max-w-6xl px-4 py-10 md:py-14">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_20%_20%,rgba(14,165,233,0.14),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(236,72,153,0.12),transparent_35%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.01)_35%,transparent_55%)]" />
+    <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
+      {/* Page intro */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 [text-wrap:balance] md:text-4xl">
+          PDF to Image
+        </h1>
+        <p className="mt-2 text-slate-500">
+          Convert PDF pages to JPEG, PNG, or WebP — entirely in your browser.
+          Nothing is uploaded.
+        </p>
+      </div>
 
-      <section className="relative overflow-hidden rounded-3xl border bg-white/85 shadow-lg backdrop-blur">
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-slate-50" />
-        <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -left-14 -bottom-10 h-40 w-40 rounded-full bg-emerald-200/40 blur-3xl" />
+      {/* Drop zone */}
+      <Dropzone
+        onFiles={addFiles}
+        disabled={!!busy}
+        overlayText={busy ?? undefined}
+        progress={busyProgress ?? undefined}
+      />
 
-        <div className="relative grid gap-10 px-6 py-8 md:px-10 md:py-12 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-wrap gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white shadow-sm">
-                <ShieldCheck className="h-4 w-4" />
-                Private by default
+      {/* Toolbar: stats + export actions */}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white px-4 py-3 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+          <span>
+            <span className="font-semibold tabular-nums text-slate-900">
+              {items.length}
+            </span>{" "}
+            {items.length === 1 ? "file" : "files"}
+          </span>
+          <span className="text-slate-300" aria-hidden="true">|</span>
+          <span>
+            <span className="font-semibold tabular-nums text-slate-900">
+              {totalSelected}
+            </span>{" "}
+            {totalSelected === 1 ? "page" : "pages"} selected
+          </span>
+          {message ? (
+            <>
+              <span className="text-slate-300" aria-hidden="true">|</span>
+              <span
+                className="text-slate-700"
+                aria-live="polite"
+                role="status"
+              >
+                {message}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">
-                <Sparkles className="h-4 w-4" />
-                Redesigned workspace
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-5xl">
-                Browser-native PDF to image studio
-              </h1>
-              <p className="max-w-2xl text-base text-slate-600 md:text-lg">
-                Collect PDFs, tune output quality, and export pages without
-                uploading anything. Everything renders locally with the updated
-                console.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border bg-white/80 p-4 shadow-sm ring-1 ring-slate-100">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-800">
-                    Drop your PDFs
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Drag in multiple documents or tap to browse. We keep each
-                    file isolated so you can cherry-pick pages to export.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                  <span className="rounded-full bg-slate-100 px-3 py-1">
-                    JPEG · PNG · WEBP
-                  </span>
-                  <span className="rounded-full bg-slate-100 px-3 py-1">
-                    High-DPI aware
-                  </span>
-                  <span className="rounded-full bg-slate-100 px-3 py-1">
-                    ZIP-ready
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4">
-                <Dropzone
-                  onFiles={addFiles}
-                  textColor="text-slate-600"
-                  className="bg-gradient-to-br from-slate-50 via-white to-slate-100 border-slate-200 hover:border-slate-300 transition-all shadow-[0_10px_50px_-45px_rgba(15,23,42,0.65)]"
-                  disabled={!!busy}
-                  overlayText={busy ?? undefined}
-                  progress={busyProgress ?? undefined}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex flex-col items-start gap-1 text-left">
-                      <div className="text-sm font-semibold text-slate-800">
-                        Drop PDFs here or click to upload
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        No servers, no waiting — everything stays on this
-                        device.
-                      </div>
-                    </div>
-                    <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 sm:inline-flex">
-                      {busy ? "Working…" : "Ready"}
-                    </div>
-                  </div>
-                </Dropzone>
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <StatCard label="Loaded PDFs" value={`${items.length}`} />
-              <StatCard
-                label="Pages selected"
-                value={`${totalSelected}`}
-                hint="Toggle pages directly from the grid."
-              />
-              <StatCard
-                label="Current output"
-                value={`${format.toUpperCase()} • ${scale.toFixed(1)}x`}
-                hint={
-                  format === "jpeg" || format === "webp"
-                    ? `Quality ${(quality * 100).toFixed(0)}%`
-                    : "Lossless export"
-                }
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-white shadow-xl">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm text-slate-300">Workspace status</p>
-                  <p className="text-lg font-semibold">
-                    {busy ?? "Ready to export"}
-                  </p>
-                  {message ? (
-                    <p className="mt-1 text-sm text-emerald-200">{message}</p>
-                  ) : null}
-                </div>
-                <div className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium">
-                  {items.length ? "Session active" : "Awaiting files"}
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="bg-white text-slate-900 hover:bg-slate-100"
-                  disabled={!hasSelection || !!busy}
-                  onClick={exportIndividually}
-                >
-                  <FileDown size={16} />
-                  Download pages
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-white/30 bg-white/5 text-white hover:bg-white/10"
-                  disabled={!hasSelection || !!busy}
-                  onClick={exportAsZip}
-                >
-                  <FileArchive size={16} />
-                  Build ZIP
-                </Button>
-              </div>
-
-              <div className="mt-5 grid grid-cols-3 gap-3 text-xs text-slate-200">
-                <div className="rounded-xl bg-white/5 px-3 py-2">
-                  <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                    Files
-                  </p>
-                  <p className="text-base font-semibold">{items.length}</p>
-                </div>
-                <div className="rounded-xl bg-white/5 px-3 py-2">
-                  <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                    Selected
-                  </p>
-                  <p className="text-base font-semibold">{totalSelected}</p>
-                </div>
-                <div className="rounded-xl bg-white/5 px-3 py-2">
-                  <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                    Format
-                  </p>
-                  <p className="text-base font-semibold">
-                    {format.toUpperCase()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border bg-white/80 p-4 shadow-sm ring-1 ring-slate-100">
-              <div className="flex items-center gap-2 text-slate-800">
-                <Wand2 className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="text-sm font-semibold">Flow at a glance</p>
-                  <p className="text-xs text-slate-500">
-                    Quick steps for the refreshed console.
-                  </p>
-                </div>
-              </div>
-              <ol className="mt-3 space-y-2 text-sm text-slate-600">
-                <li>1) Import PDFs with the drop area.</li>
-                <li>2) Select pages and tune quality + scale.</li>
-                <li>3) Export pages directly or as a ZIP bundle.</li>
-              </ol>
-            </div>
-          </div>
+            </>
+          ) : null}
         </div>
-      </section>
 
-      <section aria-labelledby="settings-heading" className="mt-10 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">
-              Conversion controls
-            </p>
-            <p className="text-sm text-slate-500">
-              Dial in quality, scale, and formats before exporting.
-            </p>
-          </div>
-          <div className="hidden rounded-full border bg-white px-3 py-1 text-xs font-medium text-slate-600 md:inline-flex">
-            <Gauge className="mr-2 h-4 w-4 text-primary" />
-            Live previews on every change.
-          </div>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!hasSelection || !!busy}
+            onClick={exportIndividually}
+          >
+            <FileDown size={16} aria-hidden="true" />
+            Download pages
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            disabled={!hasSelection || !!busy}
+            onClick={exportAsZip}
+          >
+            <FileArchive size={16} aria-hidden="true" />
+            Build ZIP
+          </Button>
         </div>
-        <h2 id="settings-heading" className="sr-only">
+      </div>
+
+      {/* Conversion controls */}
+      <section aria-labelledby="settings-heading" className="mt-6">
+        <h2
+          id="settings-heading"
+          className="mb-3 text-sm font-semibold text-slate-700"
+        >
           Conversion Settings
         </h2>
         <ControlsPanel
-          className="border-0 bg-white/80 shadow-sm ring-1 ring-slate-100"
           format={format}
           onFormatChange={setFormat}
           scale={scale}
@@ -492,71 +355,26 @@ function App() {
         />
       </section>
 
-      <section aria-labelledby="files-heading" className="mt-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">
-              Your PDF files
-            </p>
-            <p className="text-sm text-slate-500">
-              Tap any page to include or exclude it from the export.
-            </p>
-          </div>
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-            {items.length ? `${items.length} open` : "Waiting for files"}
-          </div>
-        </div>
-        <h2 id="files-heading" className="sr-only">
-          Your PDF Files
-        </h2>
-        <FileList
-          className="mb-2"
-          items={items}
-          onTogglePage={togglePage}
-          onSelectAll={selectAll}
-          onClear={clearSel}
-          onInvert={invertSel}
-          onRemove={removeDoc}
-        />
-      </section>
-
-      <footer
-        className="mt-8 rounded-2xl border bg-white/80 px-4 py-3 text-sm text-slate-600 shadow-sm backdrop-blur"
-        role="contentinfo"
-      >
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium">
-              {hasSelection ? "Selection ready" : "No pages selected"}
-            </span>
-            <span className="text-muted-foreground">{statusLine}</span>
-          </div>
-          {message ? (
-            <span className="text-foreground">{message}</span>
-          ) : null}
-        </div>
-      </footer>
+      {/* File list */}
+      {items.length > 0 && (
+        <section aria-labelledby="files-heading" className="mt-8">
+          <h2
+            id="files-heading"
+            className="mb-3 text-sm font-semibold text-slate-700"
+          >
+            Your PDF Files
+          </h2>
+          <FileList
+            items={items}
+            onTogglePage={togglePage}
+            onSelectAll={selectAll}
+            onClear={clearSel}
+            onInvert={invertSel}
+            onRemove={removeDoc}
+          />
+        </section>
+      )}
     </main>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
-  return (
-    <div className="rounded-2xl border bg-white/80 p-4 shadow-sm ring-1 ring-slate-100">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {label}
-      </p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
-      {hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
-    </div>
   );
 }
 

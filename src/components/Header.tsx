@@ -11,7 +11,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-sm">
-            <ShieldCheck className="h-5 w-5" />
+            <ShieldCheck className="h-5 w-5" aria-hidden="true" />
           </div>
           <div className="leading-tight">
             <span className="text-base font-semibold tracking-tight">
@@ -29,7 +29,7 @@ export default function Header() {
           className="hover:text-primary transition-colors text-xs font-mono text-muted-foreground"
         >
           <a href={homepage} target="_blank" rel="noopener noreferrer">
-            <GitBranch className="h-5 w-5" /> v{version}
+            <GitBranch className="h-5 w-5" aria-hidden="true" /> v{version}
           </a>
         </Button>
       </div>

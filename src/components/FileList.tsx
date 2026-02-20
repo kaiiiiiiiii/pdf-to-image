@@ -64,27 +64,30 @@ export default function FileList({
                   type="button"
                   variant="outline"
                   size="sm"
+                  aria-label="Select all pages"
                   onClick={() => onSelectAll(item.id)}
                 >
-                  <MousePointerClick size={16} />
+                  <MousePointerClick size={16} aria-hidden="true" />
                   <span className="hidden md:inline">Select all</span>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
+                  aria-label="Clear selection"
                   onClick={() => onClear(item.id)}
                 >
-                  <Eraser size={16} />
+                  <Eraser size={16} aria-hidden="true" />
                   <span className="hidden md:inline">Clear</span>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
+                  aria-label="Invert selection"
                   onClick={() => onInvert(item.id)}
                 >
-                  <ArrowDownUp size={16} />
+                  <ArrowDownUp size={16} aria-hidden="true" />
                   <span className="hidden md:inline">Invert</span>
                 </Button>
                 <Button
@@ -94,9 +97,8 @@ export default function FileList({
                   size="sm"
                   onClick={() => onRemove(item.id)}
                   aria-label={`Remove ${item.name}`}
-                  title="Remove"
                 >
-                  <Trash size={16} />
+                  <Trash size={16} aria-hidden="true" />
                   <span className="hidden md:inline">Remove</span>
                 </Button>
               </div>

@@ -2,8 +2,6 @@ import React from "react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { renderPageToCanvas } from "@/lib/pdf/render";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 
 type Props = {
   doc: PDFDocumentProxy;
@@ -75,55 +73,72 @@ export default function PageThumbnail({
       cancelled = true;
       cleanup?.();
     };
-  }, [doc, pageNumber, thumbWidth, isXL]);
+  }, [doc, pageNumber, targetWidth]);
 
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
       className={cn(
-        "relative h-48 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white/90 transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/30 xl:h-56 xl:w-42",
-        selected ? "border-primary/40 ring-2 ring-primary/60" : "",
+        "relative h-48 w-36 overflow-hidden rounded-xl border bg-white transition-[border-color,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 xl:h-56 xl:w-42",
+        selected
+          ? "border-primary/50 ring-2 ring-primary/40"
+          : "border-slate-200 hover:border-slate-300",
       )}
       onClick={() => onToggle(pageNumber)}
       aria-pressed={selected}
-      aria-label={`Page ${pageNumber}${selected ? " selected" : ""}`}
-      asChild
+      aria-label={`Page ${pageNumber}${selected ? ", selected" : ""}`}
     >
-      <div>
-        <div className="grid place-items-center bg-slate-50 xl:p-px">
-          {loading && (
-            <span className="text-xs text-muted-foreground">Loading…</span>
-          )}
-          {error && <span className="text-xs text-destructive">{error}</span>}
-          {!loading && !error && src && (
-            <img
-              src={src}
-              alt={`Page ${pageNumber}`}
-              className="block w-full h-auto object-contain"
-              decoding="async"
-              loading="lazy"
-            />
-          )}
-        </div>
-        <div
-          className={cn(
-            "absolute top-2 left-2 rounded-md px-1.5 py-0.5 text-[11px] font-medium",
-            selected
-              ? "bg-primary text-primary-foreground"
-              : "bg-slate-900/80 text-white",
-          )}
-        >
-          {pageNumber}
-        </div>
-        <div className="absolute bottom-2 right-2">
-          <Checkbox
-            className="h-4 w-4 accent-primary"
-            checked={selected}
-            aria-hidden="true"
+      <div className="grid h-full place-items-center bg-slate-50">
+        {loading && (
+          <span className="text-xs text-muted-foreground">Loading…</span>
+        )}
+        {error && <span className="text-xs text-destructive">{error}</span>}
+        {!loading && !error && src && (
+          <img
+            src={src}
+            alt={`Page ${pageNumber}`}
+            width={targetWidth}
+            height={Math.round(targetWidth * 1.414)}
+            className="block h-auto w-full object-contain"
+            decoding="async"
+            loading="lazy"
           />
-        </div>
+        )}
       </div>
-    </Button>
+      {/* Page number badge */}
+      <div
+        className={cn(
+          "absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[11px] font-medium",
+          selected
+            ? "bg-primary text-primary-foreground"
+            : "bg-slate-900/70 text-white",
+        )}
+        aria-hidden="true"
+      >
+        {pageNumber}
+      </div>
+      {/* Selected indicator */}
+      <div
+        className={cn(
+          "absolute bottom-2 right-2 h-4 w-4 rounded-sm border-2 transition-colors",
+          selected
+            ? "border-primary bg-primary"
+            : "border-slate-300 bg-white",
+        )}
+        aria-hidden="true"
+      >
+        {selected && (
+          <svg
+            viewBox="0 0 10 10"
+            className="h-full w-full text-primary-foreground"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <polyline points="2,5 4,7.5 8,2.5" />
+          </svg>
+        )}
+      </div>
+    </button>
   );
 }

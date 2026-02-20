@@ -5,7 +5,7 @@ import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 
 const config = defineConfig({
-  base: "/pdf-to-image",
+  base: "/",
   plugins: [
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
