@@ -14,8 +14,7 @@ try {
 
   // Extract version and repository URL
   const version = packageJson.version;
-  const webUrl =
-    packageJson.homepage || "https://github.com/kaiiiiiiiii/pdf-to-image";
+  const webUrl = packageJson.homepage || "https://github.com/kaiiiiiiiii/pdf-to-image";
 
   // Generate config.ts content
   const configContent = `// This file contains app configuration derived from package.json

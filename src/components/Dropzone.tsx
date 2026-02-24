@@ -29,8 +29,7 @@ export default function Dropzone({
     (list: FileList | null) => {
       if (!list) return;
       const files = Array.from(list).filter(
-        (f) =>
-          f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"),
+        (f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"),
       );
       if (files.length) onFiles(files);
     },
@@ -108,9 +107,7 @@ export default function Dropzone({
               aria-hidden="true"
             />
             <div className={cn("text-base font-medium", textColor)}>
-              {dragOver
-                ? "Release to upload"
-                : "Drop PDFs here or click to browse"}
+              {dragOver ? "Release to upload" : "Drop PDFs here or click to browse"}
             </div>
             <div className={cn("text-xs", textColor)}>
               All processing happens locally in your browser
@@ -131,9 +128,7 @@ export default function Dropzone({
         <div className="absolute inset-0 z-20 grid place-items-center bg-white/70 backdrop-blur-sm ring-1 ring-border">
           <div className="flex flex-col items-center gap-2 text-center">
             <Loader2 className={cn("h-5 w-5 animate-spin text-slate-500")} />
-            {overlayText ? (
-              <div className="text-xs text-slate-600 px-3">{overlayText}</div>
-            ) : null}
+            {overlayText ? <div className="text-xs text-slate-600 px-3">{overlayText}</div> : null}
             {typeof progress === "number" ? (
               <div className="mt-1 h-1 w-40 rounded-full bg-slate-200 overflow-hidden">
                 <div

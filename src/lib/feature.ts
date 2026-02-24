@@ -45,7 +45,7 @@ export function supportsModuleWorker(): boolean {
   try {
     const blob = new Blob(["export {};"], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
-    const w = new Worker(url, { type: "module" as any });
+    const w = new Worker(url, { type: "module" });
     w.terminate();
     URL.revokeObjectURL(url);
     return true;

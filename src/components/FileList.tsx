@@ -1,8 +1,8 @@
-import PageThumbnail from "./PageThumbnail";
+import { ArrowDownUp, Eraser, MousePointerClick, Trash } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import PageThumbnail from "./PageThumbnail";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp, Eraser, MousePointerClick, Trash } from "lucide-react";
 
 export type FileItem = {
   id: string;
@@ -43,9 +43,7 @@ export default function FileList({
           <article key={item.id} className="rounded-xl border bg-card">
             <header className="flex items-center justify-between gap-4 border-b px-4 py-3">
               <div className="min-w-0">
-                <h3 className="truncate text-base font-semibold">
-                  {item.name}
-                </h3>
+                <h3 className="truncate text-base font-semibold">{item.name}</h3>
                 <p className="text-xs text-muted-foreground">
                   {selectedCount} / {total} pages selected
                 </p>
@@ -60,21 +58,11 @@ export default function FileList({
                   <MousePointerClick size={16} />
                   <span className="hidden md:inline">Select all</span>
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onClear(item.id)}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={() => onClear(item.id)}>
                   <Eraser size={16} />
                   <span className="hidden md:inline">Clear</span>
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onInvert(item.id)}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={() => onInvert(item.id)}>
                   <ArrowDownUp size={16} />
                   <span className="hidden md:inline">Invert</span>
                 </Button>
@@ -95,17 +83,15 @@ export default function FileList({
 
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6">
-                {Array.from({ length: item.pageCount }, (_, i) => i + 1).map(
-                  (page) => (
-                    <PageThumbnail
-                      key={page}
-                      doc={item.doc}
-                      pageNumber={page}
-                      selected={item.selected.has(page)}
-                      onToggle={(p) => onTogglePage(item.id, p)}
-                    />
-                  ),
-                )}
+                {Array.from({ length: item.pageCount }, (_, i) => i + 1).map((page) => (
+                  <PageThumbnail
+                    key={page}
+                    doc={item.doc}
+                    pageNumber={page}
+                    selected={item.selected.has(page)}
+                    onToggle={(p) => onTogglePage(item.id, p)}
+                  />
+                ))}
               </div>
             </div>
           </article>

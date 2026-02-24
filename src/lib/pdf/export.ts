@@ -43,11 +43,7 @@ function extForFormat(fmt: ImageFormat): string {
   return fmt === "jpeg" ? "jpg" : fmt;
 }
 
-export function fileNameFor(
-  base: string,
-  pageNumber: number,
-  format: ImageFormat,
-): string {
+export function fileNameFor(base: string, pageNumber: number, format: ImageFormat): string {
   const safeBase = base.replace(/\.[^.]+$/, ""); // drop original extension
   return `${safeBase}-p${String(pageNumber).padStart(2, "0")}.${extForFormat(format)}`;
 }
@@ -83,15 +79,11 @@ export async function exportPageAsImage(
   const mime = mimeForFormat(fmt);
   const quality = typeof options.quality === "number" ? options.quality : 0.92;
 
-  const { canvas, width, height, cleanup } = await renderPageToCanvas(
-    doc,
-    pageNumber,
-    {
-      scale: options.pageScale ?? 1,
-      dpr: options.dpr,
-      background: options.background,
-    },
-  );
+  const { canvas, width, height, cleanup } = await renderPageToCanvas(doc, pageNumber, {
+    scale: options.pageScale ?? 1,
+    dpr: options.dpr,
+    background: options.background,
+  });
 
   try {
     const blob = await canvasToBlob(canvas, mime, quality);

@@ -16,7 +16,6 @@ export async function initPdfJsWorker(): Promise<void> {
   if (initialized) return;
   if (typeof window === "undefined") return;
   const pdfjs = await import("pdfjs-dist");
-  (pdfjs as any).GlobalWorkerOptions.workerSrc =
-    workerSrcUrl as unknown as string;
+  pdfjs.GlobalWorkerOptions.workerSrc = workerSrcUrl as unknown as string;
   initialized = true;
 }

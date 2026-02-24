@@ -74,8 +74,7 @@ export default function ControlsPanel({
           )}
         >
           <label className="text-sm font-medium">
-            Quality:{" "}
-            <span className="tabular-nums">{(quality * 100).toFixed(0)}%</span>
+            Quality: <span className="tabular-nums">{(quality * 100).toFixed(0)}%</span>
           </label>
           <Slider
             value={[quality]}
@@ -86,9 +85,7 @@ export default function ControlsPanel({
             className="w-full"
             disabled={!showQuality}
           />
-          <p className="text-xs text-muted-foreground">
-            Applies to JPEG and WEBP only.
-          </p>
+          <p className="text-xs text-muted-foreground">Applies to JPEG and WEBP only.</p>
         </div>
       </div>
     </section>
