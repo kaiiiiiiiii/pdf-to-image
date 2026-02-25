@@ -27,7 +27,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_NO_WEBSERVER
     ? undefined
     : {
-        command: "pnpm dev",
+        command: "bun dev",
         url: baseURL,
         timeout: 120_000,
         reuseExistingServer: true,
