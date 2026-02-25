@@ -1,5 +1,6 @@
 import React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { FileArchive, FileDown } from "lucide-react";
 import type { FileItem } from "@/components/FileList";
 import type { ImageFormat } from "@/lib/pdf/export";
 import Dropzone from "@/components/Dropzone";
@@ -10,16 +11,13 @@ import { exportPageAsImage } from "@/lib/pdf/export";
 import { zipFiles } from "@/lib/zip";
 import { downloadBlob, downloadMany } from "@/lib/download";
 import { Button } from "@/components/ui/button";
-import { FileArchive, FileDown } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: App,
 });
 
-type AppFileItem = FileItem;
-
 function App() {
-  const [items, setItems] = React.useState<Array<AppFileItem>>([]);
+  const [items, setItems] = React.useState<Array<FileItem>>([]);
   const [format, setFormat] = React.useState<ImageFormat>("jpeg");
   const [scale, setScale] = React.useState<number>(2);
   const [quality, setQuality] = React.useState<number>(0.95);
@@ -27,67 +25,22 @@ function App() {
   const [busyProgress, setBusyProgress] = React.useState<number | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
 
-  // Robust ID generator that works across environments
-  const generateId = React.useCallback(() => {
-    try {
-      // Prefer native UUID if available
-      // @ts-ignore - crypto may be global in browser
-      if (
-        typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID === "function"
-      ) {
-        // @ts-ignore
-        return crypto.randomUUID();
-      }
-      // @ts-ignore
-      if (
-        typeof crypto !== "undefined" &&
-        typeof crypto.getRandomValues === "function"
-      ) {
-        // RFC4122 v4
-        // @ts-ignore
-        const bytes = crypto.getRandomValues(new Uint8Array(16));
-        bytes[6] = (bytes[6] & 0x0f) | 0x40;
-        bytes[8] = (bytes[8] & 0x3f) | 0x80;
-        const hex = [...bytes].map((b) => b.toString(16).padStart(2, "0"));
-        return (
-          hex.slice(0, 4).join("") +
-          "-" +
-          hex.slice(4, 6).join("") +
-          "-" +
-          hex.slice(6, 8).join("") +
-          "-" +
-          hex.slice(8, 10).join("") +
-          "-" +
-          hex.slice(10, 16).join("")
-        );
-      }
-    } catch {}
-    // Fallback: timestamp + random + counter
-    const rand = Math.random().toString(36).slice(2);
-    const ts = Date.now().toString(36);
-    const perf = (typeof performance !== "undefined" ? performance.now() : 0)
-      .toString(36)
-      .replace(".", "");
-    return `id_${ts}_${perf}_${rand}`;
-  }, []);
-
   const addFiles = React.useCallback(
     async (files: Array<File>) => {
-      if (!files?.length) return;
+      if (files.length === 0) return;
       setMessage(null);
       setBusy("Importing PDFs…");
       setBusyProgress(0);
       const total = files.length;
       let processed = 0;
-      const newItems: Array<AppFileItem> = [];
+      const newItems: Array<FileItem> = [];
       // Ensure IDs are unique across current and newly added items
       const usedIds = new Set<string>(items.map((i) => i.id));
       // Ensure names are unique for display/download clarity
       const usedNames = new Set<string>(items.map((i) => i.name));
       const nextUniqueId = () => {
-        let id = generateId();
-        while (usedIds.has(id)) id = generateId();
+        let id = crypto.randomUUID();
+        while (usedIds.has(id)) id = crypto.randomUUID();
         usedIds.add(id);
         return id;
       };
@@ -124,9 +77,7 @@ function App() {
             },
           });
           const pageCount = doc.numPages;
-          const selected = new Set<number>(
-            Array.from({ length: pageCount }, (_, i) => i + 1),
-          ); // default select all
+          const selected = new Set<number>(Array.from({ length: pageCount }, (_, i) => i + 1)); // default select all
           newItems.push({
             id: nextUniqueId(),
             name: displayName,
@@ -137,9 +88,9 @@ function App() {
           processed += 1;
           setBusy(`Importing PDFs… ${processed}/${total}`);
           setBusyProgress(processed / total);
-        } catch (e: any) {
-          console.error("Failed to open PDF", e);
-          setMessage(`Failed to open ${file.name}: ${e?.message ?? e}`);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setMessage(`Failed to open ${file.name}: ${msg}`);
           // Count failures as processed to keep progress moving
           processed += 1;
           setBusy(`Importing PDFs… ${processed}/${total}`);
@@ -152,7 +103,7 @@ function App() {
       setBusy(null);
       setBusyProgress(null);
     },
-    [generateId, items],
+    [items],
   );
 
   const togglePage = React.useCallback((docId: string, pageNumber: number) => {
@@ -173,9 +124,7 @@ function App() {
         if (it.id !== docId) return it;
         return {
           ...it,
-          selected: new Set(
-            Array.from({ length: it.pageCount }, (_, i) => i + 1),
-          ),
+          selected: new Set(Array.from({ length: it.pageCount }, (_, i) => i + 1)),
         };
       }),
     );
@@ -245,12 +194,10 @@ function App() {
         }
       }
       await downloadMany(downloads);
-      setMessage(
-        `Downloaded ${downloads.length} image${downloads.length === 1 ? "" : "s"}.`,
-      );
-    } catch (e: any) {
-      console.error(e);
-      setMessage(`Export failed: ${e?.message ?? e}`);
+      setMessage(`Downloaded ${downloads.length} image${downloads.length === 1 ? "" : "s"}.`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setMessage(`Export failed: ${msg}`);
     } finally {
       setBusy(null);
       setBusyProgress(null);
@@ -292,12 +239,10 @@ function App() {
       const zip = await zipFiles(entries, { level: 6 });
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
       downloadBlob(zip, `export-${stamp}.zip`);
-      setMessage(
-        `ZIP created with ${entries.length} image${entries.length === 1 ? "" : "s"}.`,
-      );
-    } catch (e: any) {
-      console.error(e);
-      setMessage(`ZIP export failed: ${e?.message ?? e}`);
+      setMessage(`ZIP created with ${entries.length} image${entries.length === 1 ? "" : "s"}.`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setMessage(`ZIP export failed: ${msg}`);
     } finally {
       setBusy(null);
       setBusyProgress(null);
@@ -312,27 +257,13 @@ function App() {
           <div className="absolute -top-12 -left-16 h-48 w-48 rounded-full bg-emerald-200/30 blur-3xl" />
           <div className="absolute -bottom-12 -right-10 h-56 w-56 rounded-full bg-rose-200/30 blur-3xl" />
           <div className="absolute inset-0 opacity-40 mix-blend-overlay [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]">
-            <svg
-              className="h-full w-full"
-              viewBox="0 0 200 200"
-              aria-hidden="true"
-            >
+            <svg className="h-full w-full" viewBox="0 0 200 200" aria-hidden="true">
               <defs>
-                <pattern
-                  id="dots"
-                  width="10"
-                  height="10"
-                  patternUnits="userSpaceOnUse"
-                >
+                <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
                   <circle cx="1" cy="1" r="0.8" fill="currentColor" />
                 </pattern>
               </defs>
-              <rect
-                width="100%"
-                height="100%"
-                fill="url(#dots)"
-                className="text-sky-100"
-              />
+              <rect width="100%" height="100%" fill="url(#dots)" className="text-sky-100" />
             </svg>
           </div>
         </div>
@@ -344,8 +275,7 @@ function App() {
               PDF to Image
             </h1>
             <p className="mt-3 md:mt-4 text-base md:text-lg text-slate-600">
-              Convert PDF pages to JPEG, PNG, or WEBP — privately in your
-              browser.
+              Convert PDF pages to JPEG, PNG, or WEBP — privately in your browser.
             </p>
 
             {/* Dropzone inside hero */}
@@ -362,9 +292,7 @@ function App() {
                   <div className="text-sm font-medium text-slate-700">
                     Drop PDFs here or click to upload
                   </div>
-                  <div className="text-xs text-slate-500">
-                    No files leave your device
-                  </div>
+                  <div className="text-xs text-slate-500">No files leave your device</div>
                 </div>
               </Dropzone>
             </div>
@@ -423,14 +351,11 @@ function App() {
                 <span className="animate-pulse">{busy}</span>
               ) : (
                 <span>
-                  {items.length} file{items.length === 1 ? "" : "s"} loaded ·{" "}
-                  {totalSelected} page
+                  {items.length} file{items.length === 1 ? "" : "s"} loaded · {totalSelected} page
                   {totalSelected === 1 ? "" : "s"} selected
                 </span>
               )}
-              {message ? (
-                <span className="ml-2 text-foreground">{message}</span>
-              ) : null}
+              {message ? <span className="ml-2 text-foreground">{message}</span> : null}
             </div>
             <div className="flex gap-2">
               <Button

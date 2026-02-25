@@ -25,12 +25,7 @@ function useMediaQuery(query: string): boolean {
   }, [query]);
   return matches;
 }
-export default function PageThumbnail({
-  doc,
-  pageNumber,
-  selected,
-  onToggle,
-}: Props) {
+export default function PageThumbnail({ doc, pageNumber, selected, onToggle }: Props) {
   const [src, setSrc] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -55,16 +50,16 @@ export default function PageThumbnail({
           background: "#ffffff",
         });
         cleanup = result.cleanup;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!cancelled) {
           const dataUrl = result.canvas.toDataURL("image/jpeg", 0.8);
           setSrc(dataUrl);
         }
-      } catch (e: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!cancelled) setError(e?.message ?? "Failed to render");
+      } catch (e: unknown) {
+        if (!cancelled) {
+          const msg = e instanceof Error ? e.message : "Failed to render";
+          setError(msg);
+        }
       } finally {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!cancelled) setLoading(false);
         // Let React paint first, then cleanup the canvas memory
         requestAnimationFrame(() => cleanup?.());
@@ -75,7 +70,7 @@ export default function PageThumbnail({
       cancelled = true;
       cleanup?.();
     };
-  }, [doc, pageNumber, thumbWidth, isXL]);
+  }, [doc, pageNumber, targetWidth]);
 
   return (
     <Button
@@ -92,9 +87,7 @@ export default function PageThumbnail({
     >
       <div>
         <div className="bg-muted grid place-items-center xl:p-px">
-          {loading && (
-            <span className="text-xs text-muted-foreground">Loading…</span>
-          )}
+          {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
           {error && <span className="text-xs text-destructive">{error}</span>}
           {!loading && !error && src && (
             <img
@@ -117,11 +110,7 @@ export default function PageThumbnail({
           {pageNumber}
         </div>
         <div className="absolute bottom-2 right-2">
-          <Checkbox
-            className="h-4 w-4 accent-primary"
-            checked={selected}
-            aria-hidden="true"
-          />
+          <Checkbox className="h-4 w-4 accent-primary" checked={selected} aria-hidden="true" />
         </div>
       </div>
     </Button>

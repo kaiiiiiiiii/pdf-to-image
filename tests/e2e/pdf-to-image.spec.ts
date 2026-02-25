@@ -3,16 +3,10 @@ import { expect, test } from "@playwright/test";
 test.describe("PDF to Image App", () => {
   test("loads app shell and controls", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("heading", { name: "PDF to Image" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Drop PDFs here or click to browse"),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "PDF to Image" })).toBeVisible();
+    await expect(page.getByText("Drop PDFs here or click to browse")).toBeVisible();
     await expect(page.getByText("Image format")).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Download ZIP" }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Download ZIP" })).toBeVisible();
   });
 
   test("format selector has PNG/JPEG/WEBP", async ({ page }) => {

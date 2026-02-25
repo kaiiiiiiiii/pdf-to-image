@@ -8,15 +8,13 @@ describe("feature detection utilities", () => {
 
   it("supportsWebP detects positive via canvas data URL", async () => {
     const originalCreate = (document as any).createElement;
-    (document as any).createElement = vi
-      .fn()
-      .mockImplementation((tag: string) => {
-        const el = originalCreate.call(document, tag);
-        if (tag.toLowerCase() === "canvas") {
-          el.toDataURL = vi.fn().mockReturnValue("data:image/webp;base64,AAA");
-        }
-        return el;
-      });
+    (document as any).createElement = vi.fn().mockImplementation((tag: string) => {
+      const el = originalCreate.call(document, tag);
+      if (tag.toLowerCase() === "canvas") {
+        el.toDataURL = vi.fn().mockReturnValue("data:image/webp;base64,AAA");
+      }
+      return el;
+    });
 
     const { supportsWebP } = await import("../feature");
     expect(supportsWebP()).toBe(true);
@@ -25,17 +23,15 @@ describe("feature detection utilities", () => {
 
   it("supportsWebP detects negative when toDataURL throws", async () => {
     const originalCreate = (document as any).createElement;
-    (document as any).createElement = vi
-      .fn()
-      .mockImplementation((tag: string) => {
-        const el = originalCreate.call(document, tag);
-        if (tag.toLowerCase() === "canvas") {
-          el.toDataURL = vi.fn().mockImplementation(() => {
-            throw new Error("not supported");
-          });
-        }
-        return el;
-      });
+    (document as any).createElement = vi.fn().mockImplementation((tag: string) => {
+      const el = originalCreate.call(document, tag);
+      if (tag.toLowerCase() === "canvas") {
+        el.toDataURL = vi.fn().mockImplementation(() => {
+          throw new Error("not supported");
+        });
+      }
+      return el;
+    });
 
     const { supportsWebP } = await import("../feature");
     expect(supportsWebP()).toBe(false);

@@ -3,8 +3,9 @@
  */
 import { dpr as getDpr } from "../feature";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import type * as PdfJsLib from "pdfjs-dist";
 
-let _pdfjs: any | null = null;
+let _pdfjs: typeof PdfJsLib | null = null;
 async function ensurePdfJs() {
   if (!_pdfjs) {
     _pdfjs = await import("pdfjs-dist");
@@ -12,10 +13,7 @@ async function ensurePdfJs() {
   return _pdfjs;
 }
 
-type PasswordHandler = (
-  updatePassword: (password: string) => void,
-  reason: number,
-) => void;
+type PasswordHandler = (updatePassword: (password: string) => void, reason: number) => void;
 
 export interface OpenPdfOptions {
   password?: string;
@@ -33,8 +31,7 @@ export async function openPdf(
   const { initPdfJsWorker } = await import("./worker");
   initPdfJsWorker();
 
-  const data =
-    input instanceof ArrayBuffer ? input : await (input as Blob).arrayBuffer();
+  const data = input instanceof ArrayBuffer ? input : await (input as Blob).arrayBuffer();
   const loadingTask = getDocument({ data, password: options.password });
   if (options.onPassword) {
     loadingTask.onPassword = options.onPassword;
@@ -75,18 +72,11 @@ export async function renderPageToCanvas(
   const ctx = canvas.getContext("2d", { alpha: false });
   if (!ctx) throw new Error("2D canvas context not available");
 
-  if (options.background) {
-    ctx.save();
-    ctx.fillStyle = options.background;
-    ctx.fillRect(0, 0, widthPx, heightPx);
-    ctx.restore();
-  } else {
-    // Default white background to avoid transparent JPEG artifacts
-    ctx.save();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, widthPx, heightPx);
-    ctx.restore();
-  }
+  // Pre-fill with background color (defaults to white to avoid transparent JPEG artifacts)
+  ctx.save();
+  ctx.fillStyle = options.background ?? "#ffffff";
+  ctx.fillRect(0, 0, widthPx, heightPx);
+  ctx.restore();
 
   const renderTask = (page as any).render({
     canvasContext: ctx as any,
