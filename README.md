@@ -37,21 +37,21 @@ I built this tool because a third‑party app at work that handles payouts for m
 ### Prerequisites
 
 - Node.js 18+
-- pnpm
+- Bun
 
 ### Install and run
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun dev
 # open http://localhost:3000
 ```
 
 ### Build and preview
 
 ```bash
-pnpm build
-pnpm serve
+bun run build
+bun run serve
 ```
 
 ## Usage Guide
@@ -162,13 +162,13 @@ GitHub Pages
 - Override at build time if needed, e.g.:
 
 ```bash
-VITE_BASE_PATH=/my-subpath pnpm build
+VITE_BASE_PATH=/my-subpath bun run build
 ```
 
 2. Build
 
 ```bash
-pnpm build
+bun run build
 ```
 
 3. Deploy
@@ -188,7 +188,7 @@ Prerendering
 Unit Tests (Vitest)
 
 ```bash
-pnpm test
+bun test
 ```
 
 - Tests live under src/lib/**tests**/ and use @testing-library/react/jsdom as needed
@@ -196,8 +196,8 @@ pnpm test
 ## End‑to‑End Tests (Playwright)
 
 ```bash
-pnpm playwright:install
-pnpm test:e2e
+bun run playwright:install
+bun run test:e2e
 ```
 
 - Specs live under tests/e2e
@@ -271,7 +271,7 @@ Common scripts from package.json:
 1. Fork and clone the repository
 2. Create a feature branch: `git checkout -b feat/your-feature`
 3. Make changes with tests
-4. Run checks: `pnpm check && pnpm test && pnpm test:e2e`
+4. Run checks: `bun run check && bun test && bun run test:e2e`
 5. Commit and push
 6. Open a pull request
 

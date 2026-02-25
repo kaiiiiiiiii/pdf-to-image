@@ -1,5 +1,5 @@
 package-lock.json
-pnpm-lock.yaml
+bun.lock
 yarn.lock
 src/routeTree.gen.ts
 src/lib/config.ts
